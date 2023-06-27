@@ -6,16 +6,16 @@ Author:
 微信公众号:
     Charles的皮卡丘
 '''
+import kanirequests
 import requests
-from ..utils import Downloader, colorize
 
+from ..utils import Downloader, colorize
 
 '''音乐下载器基类'''
 class Base():
     def __init__(self, config, logger_handle, **kwargs):
         self.source = None
-        self.session = requests.Session()
-        self.session.proxies.update(config['proxies'])
+        self.session = kanirequests.KaniRequests(proxy=config['proxies'], default_timeout=10)
         self.config = config
         self.logger_handle = logger_handle
     '''歌曲搜索'''

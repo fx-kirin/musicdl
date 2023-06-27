@@ -26,7 +26,7 @@ class Downloader():
         with session.get(songinfo['download_url'], headers=headers, stream=True) as response:
             if response.status_code not in [200]: return False
             total_size, chunk_size, downloaded_size = int(response.headers['content-length']), songinfo.get('chunk_size', 1024), 0
-            savepath = os.path.join(songinfo['savedir'], f"{songinfo['savename']}.{songinfo['ext']}")
+            savepath = os.path.join(songinfo['savedir'], f"{songinfo['singers']} - {songinfo['savename']}.{songinfo['ext']}")
             text, fp = colorize('[FileSize]: %0.2fMB/%0.2fMB', 'pink'), open(savepath, 'wb')
             with alive_bar(manual=True) as bar:
                 for chunk in response.iter_content(chunk_size=chunk_size):
