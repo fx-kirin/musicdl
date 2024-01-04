@@ -6,11 +6,14 @@ Author:
 微信公众号:
     Charles的皮卡丘
 '''
+import html
 import time
-import requests
-from .base import Base
-from ..utils import seconds2hms, filterBadCharacter
+import unicodedata
 
+import requests
+
+from ..utils import filterBadCharacter, seconds2hms
+from .base import Base
 
 '''酷我音乐下载类'''
 class Kuwo(Base):
@@ -55,6 +58,9 @@ class Kuwo(Base):
             filesize = '-MB'
             ext = download_url.split('.')[-1]
             duration = int(item.get('duration', 0))
+            for key in ["name", "artist", "album"]:
+                if key in item:
+                    item[key] = unicodedata.normalize('NFKC', html.unescape(item[key]))
             songinfo = {
                 'source': self.source,
                 'songid': str(item['rid']),

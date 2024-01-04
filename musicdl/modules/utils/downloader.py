@@ -7,11 +7,15 @@ Author:
     Charles的皮卡丘
 '''
 import os
+
+import mutagen
+from mutagen.easyid3 import EasyID3
 import requests
-from .misc import touchdir
-from .logger import colorize
+import delegator
 from alive_progress import alive_bar
 
+from .logger import colorize
+from .misc import touchdir
 
 '''下载器类'''
 class Downloader():
@@ -35,6 +39,20 @@ class Downloader():
                     downloaded_size += chunk_size
                     bar.text(text % (downloaded_size / 1024 / 1024, total_size / 1024 / 1024))
                     bar(min(downloaded_size / total_size, 1))
+            # Set mp3 Infomations
+            if songinfo['ext'] in ["m4a", "flac"]:
+                m4a_path = os.path.join(songinfo['savedir'], f"{songinfo['singers']} - {songinfo['savename']}.{songinfo['ext']}")
+                mp3_path = os.path.join(songinfo['savedir'], f"{songinfo['singers']} - {songinfo['savename']}.mp3")
+                delegator.run(f"ffmpeg -i \"{m4a_path}\" -ar 44100 -ab 128k \"{mp3_path}\"")
+                savepath = mp3_path
+            tags = EasyID3(savepath)
+            if "title" not in tags:
+                tags["title"] = songinfo["songname"]
+            if "album" not in tags:
+                tags["album"] = songinfo["album"]
+            if "artist" not in tags:
+                tags["artist"] = songinfo["singers"]
+            tags.save()
         return True
     '''设置请求头'''
     def __setheaders(self, source):
